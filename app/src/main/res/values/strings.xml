@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">myPresense Teacher</string>
+    <string name="submit">Submit</string>
 </resources>
