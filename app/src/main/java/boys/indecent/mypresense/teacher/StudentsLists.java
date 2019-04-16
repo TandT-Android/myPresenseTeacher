@@ -22,7 +22,7 @@ public class StudentsLists extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new Adapter(myDataset);
+       // mAdapter = new Adapter(myDataset);
         recyclerView.setAdapter(mAdapter);
 
 
