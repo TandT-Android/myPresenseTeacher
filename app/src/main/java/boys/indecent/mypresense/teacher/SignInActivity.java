@@ -12,5 +12,6 @@ public class SignInActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_in);
         Intent intent = new Intent(this,StudentsLists.class);
         startActivity(intent);
+
     }
 }
