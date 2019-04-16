@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">myPresense Teacher</string>
     <string name="submit">Submit</string>
+    <string name="default_web_client_id">81756185163-3plogau8gmi7fu62nn1evkqkpeofch2i.apps.googleusercontent.com</string>
+
+
 </resources>
