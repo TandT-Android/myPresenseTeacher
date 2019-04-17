@@ -1,11 +1,16 @@
 package boys.indecent.mypresense.teacher;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.format.DateFormat;
 import android.text.style.ForegroundColorSpan;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.nearby.connection.ConnectionInfo;
@@ -18,7 +23,10 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
+
+import boys.indecent.mypresense.Response;
 
 public class NearbyAttendanceActivity extends ConnectionsActivity {
     /**
@@ -81,9 +89,17 @@ public class NearbyAttendanceActivity extends ConnectionsActivity {
     private Queue<Payload> forwardingQueue;
 
     /**
+     * The list of students who are present
+     * */
+    private ArrayList<String> attendanceList;
+
+    /** Verification code to verify the child nodes */
+    private int OTP;
+    /**
      * A running log of debug messages. Only visible when DEBUG=true.
      */
-    private TextView mDebugLogView;
+    private TextView mDebugLogView, tvStateView, tvCodeView, tvCodeDesc;
+    private Button buttonStart, buttonFinish;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,19 +107,47 @@ public class NearbyAttendanceActivity extends ConnectionsActivity {
         setContentView(R.layout.activity_nearby_attendance);
 
         mDebugLogView = findViewById(R.id.debug_log);
+        tvStateView = findViewById(R.id.textViewState);
+        tvCodeView = findViewById(R.id.textViewCode);
+        tvCodeDesc = findViewById(R.id.textViewCodeDesc);
+        buttonStart = findViewById(R.id.buttonStart);
+        buttonFinish = findViewById(R.id.buttonFinish);
 
         generateName();
         generateServiceId();
-
-        setState(State.ADVERTISING);
+        attendanceList = new ArrayList<>();
     }
 
+
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         disconnectFromAllEndpoints();
         setState(State.UNKNOWN);
         stopAllEndpoints();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mState == State.UNKNOWN){
+            super.onBackPressed();
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(NearbyAttendanceActivity.this);
+            builder.setMessage("Do you want to cancel taking attendance?")
+                    .setTitle("Warning!");
+            builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    NearbyAttendanceActivity.super.onBackPressed();
+                }
+            });
+            builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
     }
 
     @Override
@@ -188,10 +232,10 @@ public class NearbyAttendanceActivity extends ConnectionsActivity {
             disconnect(endpoint);
             return;
         }
-        Response response = new Response(Response.Code.SET,"DONE");
+        Response response = new Response(Response.Code.SET, String.valueOf(OTP));
         try {
             Payload payload = Response.toPayload(response);
-            sendToChild(payload,endpoint.getId());
+            sendToChild(payload, endpoint.getId());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -253,13 +297,14 @@ public class NearbyAttendanceActivity extends ConnectionsActivity {
     }
 
     private void forwardResponse(Response response, ConnectionsActivity.Endpoint endpoint) throws IOException {
-        logD("Received attendance : "+ response.getMessage());
+        logD("Received attendance : " + response.getMessage());
+        attendanceList.add(response.getMessage());
         ArrayList<String> destination = response.getDestination();
         logD("Destination : " + destination.toString());
-        Response reply = new Response(Response.Code.ACK,"POS");
+        Response reply = new Response(Response.Code.ACK, "POS");
         reply.setDestination(destination);
         Payload payload = Response.toPayload(reply);
-        sendToChild(payload,endpoint.getId());
+        sendToChild(payload, endpoint.getId());
     }
 
     private void sendRequest() {
@@ -347,22 +392,28 @@ public class NearbyAttendanceActivity extends ConnectionsActivity {
         switch (newState) {
             case SEARCHING:
                 startDiscovering();
+                tvStateView.setText("SEARCHING");
                 break;
             case CONNECTING:
                 stopDiscovering();
+                tvStateView.setText("CONNECTING");
                 break;
             case CONNECTED:
                 sendRequest();
+                tvStateView.setText("CONNECTED");
                 break;
             case ADVERTISING:
                 startAdvertising();
+                tvStateView.setText("ADVERTISING");
                 break;
             case CONTENT:
                 stopAdvertising();
+                tvStateView.setText("CONTENT");
                 break;
             case UNKNOWN:
                 stopAdvertising();
                 stopDiscovering();
+                tvStateView.setText("IDLE");
         }
     }
 
@@ -392,7 +443,8 @@ public class NearbyAttendanceActivity extends ConnectionsActivity {
      */
     private String getRollNumber() {
         //TODO: add proper getRollNumber method
-        return String.valueOf(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail());
+        //return String.valueOf(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail());
+        return "1605271";
     }
 
     /**
@@ -476,6 +528,26 @@ public class NearbyAttendanceActivity extends ConnectionsActivity {
         SpannableString spannable = new SpannableString(msg);
         spannable.setSpan(new ForegroundColorSpan(color), 0, msg.length(), 0);
         return spannable;
+    }
+
+    public void startAttendance(View view) {
+        Random rm = new Random();
+        OTP = rm.nextInt(8999) + 1000;
+        tvCodeView.setText(String.valueOf(OTP));
+        tvCodeView.setVisibility(View.VISIBLE);
+        tvCodeDesc.setVisibility(View.VISIBLE);
+        setState(State.ADVERTISING);
+        buttonStart.setVisibility(View.INVISIBLE);
+        buttonFinish.setVisibility(View.VISIBLE);
+    }
+
+    public void finishAttendance(View view) {
+        disconnectFromAllEndpoints();
+        setState(State.UNKNOWN);
+        stopAllEndpoints();
+        Intent intent = new Intent(NearbyAttendanceActivity.this,StudentsLists.class);
+        intent.putExtra("attendanceList",attendanceList.toArray());
+        startActivity(intent);
     }
 
     public enum State {
