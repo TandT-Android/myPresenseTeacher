@@ -6,6 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -14,19 +17,24 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class StudentsLists extends Activity {
     FirebaseFirestore db;
     RecyclerView mRecyclerView;
     ArrayList<CustomClass> userArrayList;
+    Button update;
     MyRecycleViewAdapter adapter;
     CustomClass cl;
+    Map <String,Boolean> selected = new HashMap <String,Boolean>();
     protected void onCreate(Bundle savedInstanceState) {
 
 
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_students_lists);
+        update=findViewById(R.id.mUpdateBtn);
 
 
         //Intent intent = new Intent(this,SignInActivity.class);
@@ -37,10 +45,36 @@ public class StudentsLists extends Activity {
         // setUpFireBase();
         //addTestDataToFirebase();
         loadDataToFirebase();
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UpdateRollNo();
+            }
+        });
+
+
 
 
 
     }
+
+    public void  UpdateRollNo()
+    {
+
+        Log.e("MAP", selected.toString());
+
+    }
+
+//
+//    public void selectedRollNo(View v)
+//    {
+//
+//        boolean checked = ((CheckBox) v).isChecked();
+//
+//
+//    }
+
+
 
     private void loadDataToFirebase() {
 
@@ -82,14 +116,15 @@ public class StudentsLists extends Activity {
                           //userArrayList.add(c);
                           //userArrayList.notifyAll();
                         Log.e("Size", cl.getStudentList().get(0)+"");
-                       adapter = new MyRecycleViewAdapter(StudentsLists.this,cl.getStudentList());
+                       adapter = new MyRecycleViewAdapter(StudentsLists.this,cl.getStudentList(), selected);
                         mRecyclerView.setAdapter(adapter);
-
 
                     }
                 }
             }
         });
+
+
 
 
 
