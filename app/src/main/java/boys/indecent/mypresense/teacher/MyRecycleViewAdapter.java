@@ -60,6 +60,12 @@ public class MyRecycleViewAdapter extends RecyclerView.Adapter<MyRecycleViewHold
                 }
             }
         });
+
+//        if(ch.isChecked()){
+//            selected.put(userArrayList.get(i), true);
+//        }else{
+//            selected.put(userArrayList.get(i), false);
+//        }
     }
 
 
