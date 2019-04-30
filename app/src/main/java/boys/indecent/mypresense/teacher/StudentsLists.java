@@ -1,6 +1,7 @@
 package boys.indecent.mypresense.teacher;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,38 +10,51 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import static android.content.ContentValues.TAG;
 
 public class StudentsLists extends Activity {
     FirebaseFirestore db;
     RecyclerView mRecyclerView;
-    ArrayList<CustomClass> userArrayList;
     Button update;
     MyRecycleViewAdapter adapter;
-    CustomClass cl;
+    CustomClass customClassObject;
     Map <String,Boolean> selected = new HashMap <String,Boolean>();
+    String str1,str2,str3;
     protected void onCreate(Bundle savedInstanceState) {
 
 
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_students_lists);
+        Intent intent=getIntent();
+        str1=intent.getStringExtra("SEMESTER");
+        str2=intent.getStringExtra("SECTION");
+        str3=intent.getStringExtra("SUBJECT");
+       // Log.e("BUNDLE", str1+"\t"+str2+"\t"+str3);
+        Toast.makeText(StudentsLists.this,str1,Toast.LENGTH_SHORT).show();
+
         update=findViewById(R.id.mUpdateBtn);
 
 
         //Intent intent = new Intent(this,SignInActivity.class);
         // startActivity(intent);
 
-        userArrayList = new ArrayList<CustomClass>();
         setUpRecyclerView();
         // setUpFireBase();
         //addTestDataToFirebase();
@@ -51,6 +65,8 @@ public class StudentsLists extends Activity {
                 UpdateRollNo();
             }
         });
+
+
 
 
 
@@ -75,8 +91,8 @@ public class StudentsLists extends Activity {
 //    }
 
 
-
     private void loadDataToFirebase() {
+
 
 //        if (userArrayList.size()>0)
 //            userArrayList.clear();
@@ -103,32 +119,32 @@ public class StudentsLists extends Activity {
 //
 //                    }
 //                });
-        DocumentReference reference = FirebaseFirestore.getInstance().collection("YOA").document("2016").collection("SECTIONS")
-                .document("CS4");
-        reference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
-                    DocumentSnapshot snapshot = task.getResult();
-                    if(snapshot!=null){
-                        Log.e("DOC",snapshot.toString() );
-                       cl = task.getResult().toObject(CustomClass.class);
-                          //userArrayList.add(c);
-                          //userArrayList.notifyAll();
-                        Log.e("Size", cl.getStudentList().get(0)+"");
-                       adapter = new MyRecycleViewAdapter(StudentsLists.this,cl.getStudentList(), selected);
-                        mRecyclerView.setAdapter(adapter);
+        DocumentReference reference = FirebaseFirestore.getInstance().collection("SEM").document(str1).collection("SEC")
+                .document(str2);
+        reference.get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
 
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            Log.e("TASK ", "OK");
+                            DocumentSnapshot snapshot= task.getResult();
+                            if(snapshot!=null){
+                            /*for (QueryDocumentSnapshot document : task.getResult()) {
+                               // Log.e(TAG, document.getId() + " => " + document.getData());
+                                StudentsModel studentsModel=document.toObject(StudentsModel.class);
+                                userArrayList.add(studentsModel);
+                            }*/
+                            customClassObject= task.getResult().toObject(CustomClass.class);
+
+                            adapter=new MyRecycleViewAdapter(StudentsLists.this, customClassObject != null ? customClassObject.getStudentList() : null,selected );
+                            mRecyclerView.setAdapter(adapter);
+
+                        } else {
+                            Log.e(TAG, "Error getting documents: ", task.getException());
+                        }
                     }
-                }
-            }
-        });
-
-
-
-
-
-
+                }});
 
     }
 

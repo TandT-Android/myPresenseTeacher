@@ -21,6 +21,12 @@ public class MyRecycleViewAdapter extends RecyclerView.Adapter<MyRecycleViewHold
     private ArrayList<String> userArrayList;
     private Map<String, Boolean> selected;
 
+    /*MyRecycleViewAdapter(Context c, ArrayList<String> userArrayList, Map<String, Boolean> selected) {
+        this.c=c;
+        this.userArrayList = userArrayList;
+        this.selected = selected;
+    }*/
+
     MyRecycleViewAdapter(Context c, ArrayList<String> userArrayList, Map<String, Boolean> selected) {
         this.c=c;
         this.userArrayList = userArrayList;
@@ -44,9 +50,6 @@ public class MyRecycleViewAdapter extends RecyclerView.Adapter<MyRecycleViewHold
         myRecycleViewHolder.mRollno.setText(userArrayList.get(i));
         final CheckBox ch = myRecycleViewHolder.mcheck;
 
-
-
-
         ch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -55,16 +58,8 @@ public class MyRecycleViewAdapter extends RecyclerView.Adapter<MyRecycleViewHold
                 }else {
                     selected.put(userArrayList.get(i), false);
                 }
-
-
             }
         });
-
-
-
-
-
-
     }
 
 

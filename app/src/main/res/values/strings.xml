@@ -3,5 +3,33 @@
     <string name="submit">Submit</string>
     <string name="default_web_client_id">81756185163-3plogau8gmi7fu62nn1evkqkpeofch2i.apps.googleusercontent.com</string>
 
+    <string-array name="SEMESTER">
+        <item>Choose Category</item>>
+        <item>"1st"</item>
+        <item>2nd</item>
+        <item>3rd</item>
+        <item>4th</item>
+        <item>5th</item>
+        <item>6th</item>
+        <item>7th</item>
+    </string-array>
+
+    <string-array name="SECTIONS">
+        <item>Choose Category</item>>
+        <item>CS1</item>
+        <item>CS2</item>
+        <item>CS3</item>
+        <item>CS4</item>
+        <item>CS5</item>
+    </string-array>>
+
+    <string-array name="SUBJECTS">
+        <item>Choose Category</item>>
+        <item>CG</item>
+        <item>CD</item>
+        <item>OOSD</item>
+        <item>BD</item>
+    </string-array>
+
 
 </resources>
