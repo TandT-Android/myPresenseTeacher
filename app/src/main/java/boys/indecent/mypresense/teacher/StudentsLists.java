@@ -9,30 +9,22 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import boys.indecent.mypresense.teacher.models.AttendanceModel;
-import boys.indecent.mypresense.teacher.models.AttendanceService;
 
 import static android.content.ContentValues.TAG;
-import static com.google.firebase.firestore.FieldValue.arrayUnion;
 
 public class StudentsLists extends Activity {
     FirebaseFirestore db;
@@ -88,60 +80,69 @@ public class StudentsLists extends Activity {
 
         //Date current
 
+        WriteBatch batch = db.batch();
 
         for (final Map.Entry<String,Boolean> i: selected.entrySet()){
 
 //            final AttendanceService service = new AttendanceService();
 
             final DocumentReference ref = db.collection("SEM").document(str1).collection("SEC")
-                    .document(str2).collection("ROLL").document(i.getKey()).collection("SUBJECT").document(str3);
+                    .document(str2).collection("ROLL").document(i.getKey());
+
+            AttendanceModel attendanceModel = new AttendanceModel(FieldValue.serverTimestamp(), i.getValue());
+            Log.e("Attendance", attendanceModel.getDate() + " "+attendanceModel.isPresence());
+            batch.update(ref,str3, FieldValue.arrayUnion(attendanceModel));
 
            // ref.update(str3,ref.update("PRESENCE",FieldValue.arrayUnion(i.getValue())));
 
 
-           ref.get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                Log.e("TASK ", "OK");
-                                DocumentSnapshot snapshot= task.getResult();
-                                if(snapshot!=null){
-                            /*for (QueryDocumentSnapshot document : task.getResult()) {
-
-                                StudentsModel studentsModel=document.toObject(StudentsModel.class);
-                                userArrayList.add(studentsModel);
-                            }*/
-                                    // Log.e(TAG, document.getId() + " => " + document.getData());
-                                    AttendanceService  service = snapshot.toObject(AttendanceService.class);
-
-                                    AttendanceModel attendanceModel = new AttendanceModel(FieldValue.serverTimestamp(), i.getValue());
-                                    Log.e("Attendance", attendanceModel.getDATE() + " "+attendanceModel.isPRESENCE());
-                                    service.getBD().add(attendanceModel);
-
-                                    ref.set(service);
-
-
-
-
-                                } else {
-                                    Log.e(TAG, "Error getting documents: ", task.getException());
-                                }
-                            }
-                        }});
+//           ref.get()
+//                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//
+//                        @Override
+//                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                            if (task.isSuccessful()) {
+//                                Log.e("TASK ", "OK");
+//                                DocumentSnapshot snapshot= task.getResult();
+//                                if(snapshot!=null){
+//                            /*for (QueryDocumentSnapshot document : task.getResult()) {
+//
+//                                StudentsModel studentsModel=document.toObject(StudentsModel.class);
+//                                userArrayList.add(studentsModel);
+//                            }*/
+//                                    // Log.e(TAG, document.getId() + " => " + document.getData());
+//                                    AttendanceService  service = snapshot.toObject(AttendanceService.class);
+//
+//                                    AttendanceModel attendanceModel = new AttendanceModel(FieldValue.serverTimestamp(), i.getValue());
+//                                    Log.e("Attendance", attendanceModel.getDate() + " "+attendanceModel.isPresence());
+//                                    service.getBD().add(attendanceModel);
+//
+//                                    ref.set(service);
+//
+//
+//
+//
+//                                } else {
+//                                    Log.e(TAG, "Error getting documents: ", task.getException());
+//                                }
+//                            }
+//                        }});
 
            // ref.update("PRESENCE",arrayUnion(i.getValue()));
 
 
+        }
 
-
-
-
-       }
-
-
-
+        batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if( task.isSuccessful()){
+                    Toast.makeText(StudentsLists.this, "Data uploaded successfully !!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e("UPLOAD","ERROR",task.getException());
+                }
+            }
+        });
     }
 
 //

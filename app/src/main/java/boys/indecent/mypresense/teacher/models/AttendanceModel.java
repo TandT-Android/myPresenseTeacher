@@ -4,34 +4,34 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FieldValue;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Time;
 
 public class AttendanceModel implements Serializable {
 
-    FieldValue DATE;
-    boolean PRESENCE;
+    Object date;
+    boolean presence;
 
     public AttendanceModel() {
     }
 
-    public FieldValue getDATE() {
-        return DATE;
+    public Object getDate() {
+        return date;
     }
 
-    public void setDATE(FieldValue DATE) {
-        this.DATE = DATE;
+    public void setDate(FieldValue date) {
+        this.date = date;
     }
 
-    public boolean isPRESENCE() {
-        return PRESENCE;
+    public boolean isPresence() {
+        return presence;
     }
 
-    public void setPRESENCE(boolean PRESENCE) {
-        this.PRESENCE = PRESENCE;
+    public void setPresence(boolean presence) {
+        this.presence = presence;
     }
 
-    public AttendanceModel(FieldValue DATE, boolean PRESENCE) {
-        this.DATE = DATE;
-        this.PRESENCE = PRESENCE;
+    public AttendanceModel(Object date, boolean presence) {
+        this.date = Timestamp.now();
+        this.presence = presence;
     }
 }
