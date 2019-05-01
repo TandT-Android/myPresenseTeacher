@@ -19,6 +19,8 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,8 +32,6 @@ public class StudentsLists extends Activity {
     FirebaseFirestore db;
     RecyclerView mRecyclerView;
     Button update;
-    MyRecycleViewAdapter adapter;
-    CustomClass customClassObject;
     Map <String,Boolean> selected = new HashMap <String,Boolean>();
     String str1,str2,str3;
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,87 +50,35 @@ public class StudentsLists extends Activity {
 
         update=findViewById(R.id.mUpdateBtn);
 
-
-        //Intent intent = new Intent(this,SignInActivity.class);
-        // startActivity(intent);
-
         setUpRecyclerView();
-        // setUpFireBase();
-        //addTestDataToFirebase();
-        loadDataToFirebase();
+        loadDataFromFirebase();
         update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 UpdateRollNo();
             }
         });
-
-
-
-
-
-
-
     }
 
-    public void  UpdateRollNo()
-    {
-
+    public void  UpdateRollNo() {
         Log.e("MAP", selected.toString());
 
         //Date current
 
         WriteBatch batch = db.batch();
 
-        for (final Map.Entry<String,Boolean> i: selected.entrySet()){
+        AttendanceModel attendanceModelPresent = new AttendanceModel(FieldValue.serverTimestamp(), true);
+        AttendanceModel attendanceModelAbsent = new AttendanceModel(FieldValue.serverTimestamp(), false);
 
-//            final AttendanceService service = new AttendanceService();
+        for (final Map.Entry<String,Boolean> i: selected.entrySet()){
 
             final DocumentReference ref = db.collection("SEM").document(str1).collection("SEC")
                     .document(str2).collection("ROLL").document(i.getKey());
 
-            AttendanceModel attendanceModel = new AttendanceModel(FieldValue.serverTimestamp(), i.getValue());
-            Log.e("Attendance", attendanceModel.getDate() + " "+attendanceModel.isPresence());
-            batch.update(ref,str3, FieldValue.arrayUnion(attendanceModel));
-
-           // ref.update(str3,ref.update("PRESENCE",FieldValue.arrayUnion(i.getValue())));
-
-
-//           ref.get()
-//                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//
-//                        @Override
-//                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                            if (task.isSuccessful()) {
-//                                Log.e("TASK ", "OK");
-//                                DocumentSnapshot snapshot= task.getResult();
-//                                if(snapshot!=null){
-//                            /*for (QueryDocumentSnapshot document : task.getResult()) {
-//
-//                                StudentsModel studentsModel=document.toObject(StudentsModel.class);
-//                                userArrayList.add(studentsModel);
-//                            }*/
-//                                    // Log.e(TAG, document.getId() + " => " + document.getData());
-//                                    AttendanceService  service = snapshot.toObject(AttendanceService.class);
-//
-//                                    AttendanceModel attendanceModel = new AttendanceModel(FieldValue.serverTimestamp(), i.getValue());
-//                                    Log.e("Attendance", attendanceModel.getDate() + " "+attendanceModel.isPresence());
-//                                    service.getBD().add(attendanceModel);
-//
-//                                    ref.set(service);
-//
-//
-//
-//
-//                                } else {
-//                                    Log.e(TAG, "Error getting documents: ", task.getException());
-//                                }
-//                            }
-//                        }});
-
-           // ref.update("PRESENCE",arrayUnion(i.getValue()));
-
-
+            if (i.getValue())
+                batch.update(ref,str3, FieldValue.arrayUnion(attendanceModelPresent));
+            else
+                batch.update(ref,str3, FieldValue.arrayUnion(attendanceModelAbsent));
         }
 
         batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -145,97 +93,38 @@ public class StudentsLists extends Activity {
         });
     }
 
-//
-//    public void selectedRollNo(View v)
-//    {
-//
-//        boolean checked = ((CheckBox) v).isChecked();
-//
-//
-//    }
-
-
-    private void loadDataToFirebase() {
-
-
-//        if (userArrayList.size()>0)
-//            userArrayList.clear();
-
-        // db.collection("YOA")
-//                .get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        for (QueryDocumentSnapshot querySnapshot:task.getResult()){
-//
-//                            user User = new user(querySnapshot.getString("Roll No"));
-//                            userArrayList.add(User);
-//
-//                        }
-//                        adapter = new MyRecycleViewAdapter(MainActivity.this,userArrayList);
-//                        mRecyclerView.setAdapter(adapter);
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Toast.makeText(MainActivity.this,"Fail to mark",Toast.LENGTH_SHORT).show();
-//
-//                    }
-//                });
+    private void loadDataFromFirebase() {
         DocumentReference reference = db.collection("SEM").document(str1).collection("SEC")
                 .document(str2);
         reference.get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             Log.e("TASK ", "OK");
                             DocumentSnapshot snapshot= task.getResult();
                             if(snapshot!=null){
-                            /*for (QueryDocumentSnapshot document : task.getResult()) {
-                               // Log.e(TAG, document.getId() + " => " + document.getData());
-                                StudentsModel studentsModel=document.toObject(StudentsModel.class);
-                                userArrayList.add(studentsModel);
-                            }*/
-                            customClassObject= task.getResult().toObject(CustomClass.class);
-
-                            adapter=new MyRecycleViewAdapter(StudentsLists.this, customClassObject != null ? customClassObject.getStudentList() : null,selected );
-                            mRecyclerView.setAdapter(adapter);
-
-                        } else {
-                            Log.e(TAG, "Error getting documents: ", task.getException());
+                                setUpAdapter(snapshot);
+                            } else {
+                                Log.e(TAG, "Error getting documents: ", task.getException());
+                            }
                         }
                     }
-                }});
+                });
 
     }
 
- /*   private void addTestDataToFirebase() {
-        Random random = new Random();
-        for (int i=0;i<6;i++) {
-            Map<String, String> dataMap = new HashMap<>();
+    private void setUpAdapter(DocumentSnapshot snapshot) {
+        ArrayList<String> studentList = new ArrayList<>((Collection<? extends String>) snapshot.get("StudentList"));
 
-            dataMap.put("rollno", "try rollno" + random.nextInt());
-
-
-            db.collection("YOA")
-                    .add(dataMap)
-                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                        @Override
-                        public void onSuccess(DocumentReference documentReference) {
-                            Toast.makeText(MainActivity.this, "Roll No. Fetched", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+        for (String x : studentList){
+            selected.put(x,false);
         }
-    }*/
 
-    // private void setUpFireBase() {
+        MyRecycleViewAdapter adapter = new MyRecycleViewAdapter(StudentsLists.this,studentList,selected);
 
-    //      db = FirebaseFirestore.getInstance();
-
-    //  }
+        mRecyclerView.setAdapter(adapter);
+    }
 
     private void setUpRecyclerView() {
         mRecyclerView = findViewById(R.id.mRecycleView);

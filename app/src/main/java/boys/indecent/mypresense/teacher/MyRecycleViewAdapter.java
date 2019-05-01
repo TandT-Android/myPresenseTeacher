@@ -21,6 +21,8 @@ public class MyRecycleViewAdapter extends RecyclerView.Adapter<MyRecycleViewHold
     private ArrayList<String> userArrayList;
     private Map<String, Boolean> selected;
 
+    boolean bind;
+
     /*MyRecycleViewAdapter(Context c, ArrayList<String> userArrayList, Map<String, Boolean> selected) {
         this.c=c;
         this.userArrayList = userArrayList;
@@ -40,7 +42,6 @@ public class MyRecycleViewAdapter extends RecyclerView.Adapter<MyRecycleViewHold
         LayoutInflater layoutInflater = LayoutInflater.from(c);
         View view = layoutInflater.inflate(R.layout.single_row, viewGroup,false);
 
-
         return new MyRecycleViewHolder(view);
     }
 
@@ -49,29 +50,43 @@ public class MyRecycleViewAdapter extends RecyclerView.Adapter<MyRecycleViewHold
 
         myRecycleViewHolder.mRollno.setText(userArrayList.get(i));
         final CheckBox ch = myRecycleViewHolder.mcheck;
-        if(!ch.isChecked())
-        ch.setChecked(false);
-        else
-            ch.setChecked(true);
+
+        bind = true;
+        if(selected.containsKey(userArrayList.get(i))){
+            Log.i("ARRAYLIST",userArrayList.get(i)+" : "+selected.get(userArrayList.get(i)));
+            if (selected.get(userArrayList.get(i))){
+                ch.setChecked(true);
+            } else {
+                ch.setChecked(false);
+            }
+        } else {
+            ch.setChecked(false);
+            selected.put(userArrayList.get(i),false);
+            Log.i("MAP UPDATE",userArrayList.get(i));
+        }
+        bind = false;
 
         ch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    selected.put(userArrayList.get(i), true);
-                    ch.setChecked(true);
-                }else {
-                    selected.put(userArrayList.get(i), false);
-                    ch.setChecked(false);
+                if (!bind){
+                    if(isChecked){
+                        selected.put(userArrayList.get(i), true);
+                        ch.setChecked(true);
+                    }else {
+                        selected.put(userArrayList.get(i), false);
+                        ch.setChecked(false);
+                    }
                 }
+                //notifyDataSetChanged();
             }
         });
 
-        if(ch.isChecked()){
-            selected.put(userArrayList.get(i), true);
-        }else{
-            selected.put(userArrayList.get(i), false);
-        }
+//        if(ch.isChecked()){
+//            selected.put(userArrayList.get(i), true);
+//        }else{
+//            selected.put(userArrayList.get(i), false);
+//        }
     }
 
 
