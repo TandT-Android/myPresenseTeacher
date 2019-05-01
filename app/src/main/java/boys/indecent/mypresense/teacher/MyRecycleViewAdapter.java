@@ -49,23 +49,29 @@ public class MyRecycleViewAdapter extends RecyclerView.Adapter<MyRecycleViewHold
 
         myRecycleViewHolder.mRollno.setText(userArrayList.get(i));
         final CheckBox ch = myRecycleViewHolder.mcheck;
+        if(!ch.isChecked())
+        ch.setChecked(false);
+        else
+            ch.setChecked(true);
 
         ch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     selected.put(userArrayList.get(i), true);
+                    ch.setChecked(true);
                 }else {
                     selected.put(userArrayList.get(i), false);
+                    ch.setChecked(false);
                 }
             }
         });
 
-//        if(ch.isChecked()){
-//            selected.put(userArrayList.get(i), true);
-//        }else{
-//            selected.put(userArrayList.get(i), false);
-//        }
+        if(ch.isChecked()){
+            selected.put(userArrayList.get(i), true);
+        }else{
+            selected.put(userArrayList.get(i), false);
+        }
     }
 
 
