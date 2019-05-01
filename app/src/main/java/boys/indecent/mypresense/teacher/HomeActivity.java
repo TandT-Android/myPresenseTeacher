@@ -100,6 +100,14 @@ public class HomeActivity extends AppCompatActivity{
             }
         });
 
+
+        b1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewAttendance();
+            }
+        });
+
     }
 
 
@@ -122,4 +130,15 @@ public class HomeActivity extends AppCompatActivity{
 
 
     }
+
+
+
+    public void viewAttendance()
+    {
+        Intent intent = new Intent(this,ViewAttendance.class);
+        startActivity(intent);
+
+
+    }
+
 }

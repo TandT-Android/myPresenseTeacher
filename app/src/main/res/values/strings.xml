@@ -21,7 +21,8 @@
         <item>CS3</item>
         <item>CS4</item>
         <item>CS5</item>
-    </string-array>>
+    </string-array>
+    >
 
     <string-array name="SUBJECTS">
         <item>Choose Category</item>>
