@@ -34,6 +34,7 @@ public class StudentsLists extends Activity {
     Button update;
     Map <String,Boolean> selected = new HashMap <String,Boolean>();
     String str1,str2,str3;
+    int totalPresence=0,totalAbsent=0,total=0;
     protected void onCreate(Bundle savedInstanceState) {
 
 
@@ -46,7 +47,7 @@ public class StudentsLists extends Activity {
         str2=intent.getStringExtra("SECTION");
         str3=intent.getStringExtra("SUBJECT");
        // Log.e("BUNDLE", str1+"\t"+str2+"\t"+str3);
-        Toast.makeText(StudentsLists.this,str1,Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(StudentsLists.this,str1,Toast.LENGTH_SHORT).show();
 
         update=findViewById(R.id.mUpdateBtn);
 
@@ -75,19 +76,40 @@ public class StudentsLists extends Activity {
             final DocumentReference ref = db.collection("SEM").document(str1).collection("SEC")
                     .document(str2).collection("ROLL").document(i.getKey());
 
-            if (i.getValue())
-                batch.update(ref,str3, FieldValue.arrayUnion(attendanceModelPresent));
-            else
-                batch.update(ref,str3, FieldValue.arrayUnion(attendanceModelAbsent));
+            if (i.getValue()) {
+                batch.update(ref, str3, FieldValue.arrayUnion(attendanceModelPresent));
+                totalPresence++;
+
+            }
+            else {
+                batch.update(ref, str3, FieldValue.arrayUnion(attendanceModelAbsent));
+                totalAbsent++;
+            }
         }
+        Toast.makeText(StudentsLists.this,String.valueOf(totalPresence), Toast.LENGTH_SHORT).show();
 
         batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if( task.isSuccessful()){
-                    Toast.makeText(StudentsLists.this, "Data uploaded successfully !!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(StudentsLists.this,"Data uploaded successfully !!", Toast.LENGTH_SHORT).show();
+
+                    total=totalAbsent+totalPresence;
+
+
+
+                    Intent intent = new Intent(StudentsLists.this,Report.class);
+                    intent.putExtra("PRESENCE",totalPresence);
+                    intent.putExtra("ABSENT",totalAbsent);
+                    intent.putExtra("TOTAL",total);
+
+                    Toast.makeText(StudentsLists.this,String.valueOf(totalPresence), Toast.LENGTH_SHORT).show();
+                    startActivity(intent);
+
+
                 } else {
                     Log.e("UPLOAD","ERROR",task.getException());
+                    Toast.makeText(StudentsLists.this,"Try Again!!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
