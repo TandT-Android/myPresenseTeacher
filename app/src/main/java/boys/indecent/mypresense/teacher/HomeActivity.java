@@ -15,8 +15,8 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        b1=findViewById(R.id.ViewAttendence);
-        b2=findViewById(R.id.MarkAttendence);
+        b1=findViewById(R.id.viewAttendence);
+        b2=findViewById(R.id.markAttendance);
         b2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
