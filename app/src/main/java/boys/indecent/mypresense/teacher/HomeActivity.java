@@ -1,141 +1,147 @@
 package boys.indecent.mypresense.teacher;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import static android.widget.Toast.LENGTH_LONG;
+import com.gauravk.bubblenavigation.BubbleNavigationConstraintView;
+import com.gauravk.bubblenavigation.listener.BubbleNavigationChangeListener;
 
-public class HomeActivity extends AppCompatActivity{
+public class HomeActivity extends AppCompatActivity {
 
-    Button b1,b2;
-    Spinner s1,s2,s3;
-    String str1,str2,str3;;
+    Button firstFragment, secondFragment;
+//    private int pos=0;
+    /**
+     * The {@link android.support.v4.view.PagerAdapter} that will provide
+     * fragments for each of the sections. We use a
+     * {@link FragmentPagerAdapter} derivative, which will keep every
+     * loaded fragment in memory. If this becomes too memory intensive, it
+     * may be best to switch to a
+     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     */
+    private SectionsPagerAdapter mSectionsPagerAdapter;
 
+    /**
+     * The {@link ViewPager} that will host the section contents.
+     */
+    private ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        b1=findViewById(R.id.ViewAttendence);
-        b2=findViewById(R.id.MarkAttendence);
-
-        s1=findViewById(R.id.spinner1);
-        ArrayAdapter <CharSequence> adapter1 =ArrayAdapter.createFromResource(this,R.array.SEMESTER,android.R.layout.simple_spinner_item) ;
-        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        s1.setAdapter((adapter1));
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        mSectionsPagerAdapter = new HomeActivity.SectionsPagerAdapter(getSupportFragmentManager());
 
 
-        s1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
+
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+
+        final BubbleNavigationChangeListener listener = new BubbleNavigationChangeListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                 str1 = parent.getItemAtPosition(position).toString();
-                Toast.makeText(HomeActivity.this,str1,Toast.LENGTH_SHORT).show();
+            public void onNavigationChanged(View view, int position) {
+                mViewPager.setCurrentItem(position);
+                mSectionsPagerAdapter.notifyDataSetChanged();
+                //Toast.makeText(HomeActivity.this, "Changed to"+position, Toast.LENGTH_SHORT).show();
+//                pos=position;
+//                mSectionsPagerAdapter.getItem(pos);
+            }
+        };
 
+        final BubbleNavigationConstraintView constraintView= findViewById(R.id.bubbleNavigationConstraintView);
+        constraintView.setNavigationChangeListener(listener);
+
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
 
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-
-
-        s2=findViewById(R.id.spinner2);
-        ArrayAdapter <CharSequence> adapter2 =ArrayAdapter.createFromResource(this,R.array.SECTIONS,android.R.layout.simple_spinner_item) ;
-        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        s2.setAdapter((adapter2));
-        s2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                str2 = parent.getItemAtPosition(position).toString();
-                Toast.makeText(HomeActivity.this,str2,Toast.LENGTH_SHORT).show();
-
+            public void onPageSelected(int i) {
+                constraintView.setCurrentActiveItem(i);
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+            public void onPageScrollStateChanged(int i) {
 
-            }
-        });
-
-
-        s3=findViewById(R.id.spinner3);
-        ArrayAdapter <CharSequence> adapter3 =ArrayAdapter.createFromResource(this,R.array.SUBJECTS,android.R.layout.simple_spinner_item) ;
-        adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        s3.setAdapter((adapter3));
-        s3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                 str3 = parent.getItemAtPosition(position).toString();
-                Toast.makeText(HomeActivity.this,str3,Toast.LENGTH_SHORT).show();
-
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-
-
-
-        b2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openStudentsLists();
-            }
-        });
-
-
-        b1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewAttendance();
             }
         });
 
     }
 
+    /**
+     * A placeholder fragment containing a simple view.
+     */
+    public static class PlaceholderFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
 
+        public PlaceholderFragment() {
+        }
 
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static PlaceholderFragment newInstance(int sectionNumber) {
+            PlaceholderFragment fragment = new PlaceholderFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
 
-
-    public void openStudentsLists()
-    {
-
-        Intent intent = new Intent(this,StudentsLists.class);
-        intent.putExtra("SEMESTER",str1);
-        intent.putExtra("SECTION",str2);
-        intent.putExtra("SUBJECT",str3);
-
-        startActivity(intent);
-
-
-
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_main2, container, false);
+            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            return rootView;
+        }
     }
 
+    /**
+     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+     * one of the sections/tabs/pages.
+     */
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
 
-    public void viewAttendance()
-    {
-        Intent intent = new Intent(this,ViewAttendance.class);
-        startActivity(intent);
+        @Override
+        public Fragment getItem(int position) {
+            // getItem is called to instantiate the fragment for the given page.
+            // Return a PlaceholderFragment (defined as a static inner class below).
+            //pos=position;
+            return HomeActivity.PlaceholderFragment.newInstance(position+1);
+        }
 
-
+        @Override
+        public int getCount() {
+            return 2;
+        }
     }
 
 }

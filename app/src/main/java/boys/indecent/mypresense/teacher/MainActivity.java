@@ -1,40 +1,41 @@
 package boys.indecent.mypresense.teacher;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.widget.Toast;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import com.bumptech.glide.Glide;
 
 public class MainActivity extends AppCompatActivity {
 
+    ImageView imageView;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent intent = new Intent(this, SignInActivity.class);
-        startActivity(intent);
+        imageView = findViewById(R.id.gifView);
+        Handler handler =new Handler();
+        Runnable runnable= new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(MainActivity.this, SignInActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        };
+        handler.postDelayed(runnable,3000);
 
-
-         }
+        Glide.with(MainActivity.this).load(R.raw.logo).into(imageView);
+    }
 }
