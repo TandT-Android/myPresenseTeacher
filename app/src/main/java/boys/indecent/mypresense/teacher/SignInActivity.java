@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -32,6 +34,8 @@ public class SignInActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
         FirebaseAuth firebaseAuth1 = FirebaseAuth.getInstance();
         if (firebaseAuth1.getCurrentUser() != null){
             Intent intent = new Intent(SignInActivity.this,HomeActivity.class);
@@ -45,6 +49,10 @@ public class SignInActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+
+        ImageView logo= findViewById(R.id.logosignin);
+        //logo.setBackgroundResource(R.drawable.logosignin);
+
        // Intent intent = new Intent(this,StudentsLists.class);
       //  startActivity(intent);
 
@@ -57,7 +65,7 @@ public class SignInActivity extends AppCompatActivity {
 
         mGoogleSignInClient = GoogleSignIn.getClient(this,gso);
 
-        signInButton = findViewById(R.id.mybutoon);
+        signInButton = findViewById(R.id.signInButton);
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,9 +107,6 @@ public class SignInActivity extends AppCompatActivity {
                     signOut();
                     revokeAccess();
                     signIn();
-
-
-
                 }
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
