@@ -31,9 +31,9 @@ public class Report extends AppCompatActivity {
         totalPresents=findViewById(R.id.totalpresents);
         totalAbsents=findViewById(R.id.totalabsents);
 
-        totalStudents.setText(""+totalStudent);
-        totalPresents.setText(""+totalPresent);
-        totalAbsents.setText(""+totalAbsent);
+        totalStudents.setText(String.valueOf(totalStudent));
+        totalPresents.setText(String.valueOf(totalPresent));
+        totalAbsents.setText(String.valueOf(totalAbsent));
 
 
     }
