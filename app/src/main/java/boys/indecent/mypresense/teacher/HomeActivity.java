@@ -1,5 +1,6 @@
 package boys.indecent.mypresense.teacher;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,8 +19,6 @@ import com.gauravk.bubblenavigation.listener.BubbleNavigationChangeListener;
 
 public class HomeActivity extends AppCompatActivity {
 
-    Button firstFragment, secondFragment;
-//    private int pos=0;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
